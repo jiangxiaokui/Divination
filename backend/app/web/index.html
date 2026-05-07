@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>玄镜 · 占卜台</title>
+    <link rel="prefetch" href="/bazi" />
+    <link rel="prefetch" href="/liuyao" />
+    <link rel="prefetch" href="/name-wuge" />
+    <link rel="prefetch" href="/tarot" />
+    <link rel="prefetch" href="/lots" />
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <nav class="top-nav">
+      <a class="nav-logo" href="/">玄 镜</a>
+      <div class="nav-links">
+        <a href="/bazi">八字</a>
+        <a href="/liuyao">六爻</a>
+        <a href="/name-wuge">姓名</a>
+        <a href="/tarot">塔罗</a>
+        <a href="/lots">灵签</a>
+      </div>
+    </nav>
+    <main class="container">
+      <section class="hero panel reveal">
+        <p class="eyebrow">Divination Workbench</p>
+        <h1>玄镜 · 占卜台</h1>
+        <p class="subtitle">古法推演，洞察命理玄机。选择模块，即刻入局。</p>
+        <div class="status" id="runtimeStatus">正在检测服务状态…</div>
+      </section>
+
+      <section class="grid">
+        <a class="portal-link reveal delay-1" href="/bazi">
+          <span class="module-icon">☯</span>
+          <h2>八字命理（四柱）</h2>
+          <p>以生辰八字推算五行命盘，解读命势与大运走向。</p>
+        </a>
+        <a class="portal-link reveal delay-2" href="/liuyao">
+          <span class="module-icon">☵</span>
+          <h2>六爻占卜</h2>
+          <p>摇卦起爻，动静互参，直出吉凶判断与应期。</p>
+        </a>
+        <a class="portal-link reveal delay-3" href="/name-wuge">
+          <span class="module-icon">字</span>
+          <h2>姓名学 · 五格剖象</h2>
+          <p>拆解天地人外总五格数理，评判姓名吉凶能量。</p>
+        </a>
+        <a class="portal-link reveal delay-4" href="/tarot">
+          <span class="module-icon">🃏</span>
+          <h2>塔罗占卜</h2>
+          <p>大阿卡纳牌阵抽牌，结合主题给出深度解读。</p>
+        </a>
+        <a class="portal-link reveal delay-5" href="/lots">
+          <span class="module-icon">🎋</span>
+          <h2>灵签（观音 / 月老）</h2>
+          <p>虔诚起意，随机抽签，签诗解签一步到位。</p>
+        </a>
+      </section>
+    </main>
+
+    <script src="/static/portal.js"></script>
+    <canvas id="bgCanvas"></canvas>
+    <script src="/static/bg-anim.js"></script>
+  </body>
+</html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>玄镜 · 管理后台</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="aura aura-left"></div>
+    <div class="aura aura-right"></div>
+    <main class="container">
+      <section class="panel reveal">
+        <p class="eyebrow">Admin Console</p>
+        <h1>玄镜 · 管理后台</h1>
+        <p class="subtitle">仅管理员可登录查看入库记录。</p>
+      </section>
+
+      <section class="grid">
+        <article class="panel reveal delay-1">
+          <h2>管理员登录</h2>
+          <form id="adminLoginForm" class="form">
+            <label>
+              用户名
+              <input name="username" required placeholder="admin" />
+            </label>
+            <label>
+              密码
+              <input name="password" type="password" required placeholder="请输入管理员密码" />
+            </label>
+            <button type="submit">登录</button>
+          </form>
+          <button id="logoutBtn" class="ghost" style="margin-top: 10px">退出登录</button>
+          <p class="hint" id="loginState">未登录</p>
+        </article>
+
+        <article class="panel reveal delay-2">
+          <h2>运行状态</h2>
+          <form id="runtimeForm" class="form inline">
+            <button type="submit">刷新状态</button>
+          </form>
+          <pre id="runtimeBox">请先登录后查看...</pre>
+        </article>
+      </section>
+
+      <section class="panel reveal delay-3">
+        <div class="result-head">
+          <h2>最近占卜记录</h2>
+          <form id="recordsForm" class="form inline">
+            <input name="limit" type="number" min="1" max="200" value="50" />
+            <button type="submit">加载记录</button>
+          </form>
+        </div>
+        <pre id="recordsBox">请先登录后加载记录...</pre>
+      </section>
+    </main>
+
+    <script src="/static/admin.js"></script>
+  </body>
+</html>

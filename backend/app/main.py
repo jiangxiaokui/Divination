@@ -1,0 +1,75 @@
+from pathlib import Path
+
+from fastapi import FastAPI
+from fastapi.responses import FileResponse, Response
+from fastapi.staticfiles import StaticFiles
+
+from app.api.v1.router import router as api_router
+from app.core.config import get_settings
+from app.db.base import Base
+from app.db.session import engine
+
+# Ensure models are registered before create_all.
+from app import models  # noqa: F401
+
+settings = get_settings()
+BASE_DIR = Path(__file__).resolve().parent
+WEB_DIR = BASE_DIR / "web"
+STATIC_DIR = WEB_DIR / "static"
+
+app = FastAPI(title=settings.app_name, debug=settings.app_debug)
+app.include_router(api_router)
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+
+@app.get("/")
+def root() -> FileResponse:
+    return FileResponse(WEB_DIR / "index.html")
+
+
+@app.get("/admin")
+def admin_page() -> FileResponse:
+    return FileResponse(WEB_DIR / "admin.html")
+
+
+@app.get("/bazi")
+def bazi_page() -> FileResponse:
+    return FileResponse(WEB_DIR / "bazi.html")
+
+
+@app.get("/liuyao")
+def liuyao_page() -> FileResponse:
+    return FileResponse(WEB_DIR / "liuyao.html")
+
+
+@app.get("/name-wuge")
+def name_wuge_page() -> FileResponse:
+    return FileResponse(WEB_DIR / "name-wuge.html")
+
+
+@app.get("/tarot")
+def tarot_page() -> FileResponse:
+    return FileResponse(WEB_DIR / "tarot.html")
+
+
+@app.get("/lots")
+def lots_page() -> FileResponse:
+    return FileResponse(WEB_DIR / "lots.html")
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon() -> Response:
+    return Response(status_code=204)
+
+
+@app.get("/healthz")
+def healthz() -> dict:
+    return {"status": "ok"}
+
+
+@app.on_event("startup")
+def on_startup() -> None:
+    if not settings.db_persistence_enabled:
+        return
+
+    Base.metadata.create_all(bind=engine)

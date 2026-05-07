@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>姓名学五格 · 玄镜</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <nav class="top-nav">
+      <a class="nav-logo" href="/">玄 镜</a>
+      <div class="nav-links">
+        <a href="/bazi">八字</a>
+        <a href="/liuyao">六爻</a>
+        <a href="/name-wuge" class="active">姓名</a>
+        <a href="/tarot">塔罗</a>
+        <a href="/lots">灵签</a>
+      </div>
+    </nav>
+    <main class="container">
+      <section class="hero panel reveal">
+        <p class="eyebrow">Module · Name WuGe</p>
+        <h1>姓名学 / 五格剖象</h1>
+        <p class="subtitle">拆解天地人外总五格数理，评判姓名吉凶能量与三才配置。</p>
+      </section>
+
+      <section class="module-layout reveal delay-1">
+        <article class="panel form-panel">
+          <h2>姓名学表单</h2>
+          <form id="nameForm" class="form">
+            <div class="form-group">
+              <span class="form-label">解读模式</span>
+              <div class="mode-toggle">
+                <button type="button" class="mode-btn active" data-mode="fast">⚡ 极速</button>
+                <button type="button" class="mode-btn" data-mode="deep">🔮 深度</button>
+              </div>
+              <input type="hidden" name="readingMode" value="fast" />
+            </div>
+
+            <label>姓名<input name="fullName" required placeholder="张三" /></label>
+            <label>
+              字形体系
+              <select name="scriptType">
+                <option value="simplified">简体</option>
+                <option value="traditional">繁体</option>
+              </select>
+            </label>
+
+            <div class="form-group">
+              <span class="form-label">性别</span>
+              <div class="radio-row">
+                <label class="radio-opt"><input type="radio" name="gender" value="male" checked /> 男</label>
+                <label class="radio-opt"><input type="radio" name="gender" value="female" /> 女</label>
+                <label class="radio-opt"><input type="radio" name="gender" value="other" /> 其他</label>
+              </div>
+            </div>
+
+            <label>咨询问题<textarea name="question" rows="3" placeholder="这个名字适合长期发展吗？"></textarea></label>
+            <button type="submit" id="submitBtn">开始分析</button>
+          </form>
+        </article>
+
+        <article class="panel result-panel">
+          <div class="result-head">
+            <h2>分析结果</h2>
+            <button id="clearResult" class="ghost">清空</button>
+          </div>
+          <div id="resultCards" class="cards-wrap">
+            <article class="result-card muted"><h3>等待分析</h3><p>提交后这里会显示最终结果。</p></article>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="/static/result-ui.js"></script>
+    <script src="/static/name-wuge.js"></script>
+    <canvas id="bgCanvas"></canvas>
+    <script src="/static/bg-anim.js"></script>
+  </body>
+</html>

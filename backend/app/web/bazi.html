@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>八字命理 · 玄镜</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <nav class="top-nav">
+      <a class="nav-logo" href="/">玄 镜</a>
+      <div class="nav-links">
+        <a href="/bazi" class="active">八字</a>
+        <a href="/liuyao">六爻</a>
+        <a href="/name-wuge">姓名</a>
+        <a href="/tarot">塔罗</a>
+        <a href="/lots">灵签</a>
+      </div>
+    </nav>
+    <main class="container">
+      <section class="hero panel reveal">
+        <p class="eyebrow">Module · BaZi Four Pillars</p>
+        <h1>八字命理（四柱）</h1>
+        <p class="subtitle">填写出生信息，系统将推算命盘五行与近期运势。</p>
+      </section>
+
+      <section class="module-layout reveal delay-1">
+        <article class="panel form-panel">
+          <h2>测算表单</h2>
+          <form id="baziForm" class="form">
+            <div class="form-group">
+              <span class="form-label">解读模式</span>
+              <div class="mode-toggle">
+                <button type="button" class="mode-btn active" data-mode="fast">⚡ 极速</button>
+                <button type="button" class="mode-btn" data-mode="deep">🔮 深度</button>
+              </div>
+              <input type="hidden" name="readingMode" value="fast" />
+            </div>
+
+            <div class="form-group">
+              <span class="form-label">出生时间</span>
+              <div class="date-row">
+                <select name="birthYear" class="date-part" required>
+                  <option value="">年</option>
+                </select>
+                <select name="birthMonth" class="date-part" required>
+                  <option value="">月</option>
+                </select>
+                <select name="birthDay" class="date-part" required>
+                  <option value="">日</option>
+                </select>
+                <select name="birthHour" class="date-part" required>
+                  <option value="">时辰</option>
+                </select>
+              </div>
+            </div>
+
+            <label>出生地（可选）<input name="birthPlace" placeholder="例如：杭州" /></label>
+
+            <div class="form-group">
+              <span class="form-label">性别</span>
+              <div class="radio-row">
+                <label class="radio-opt"><input type="radio" name="gender" value="male" checked /> 男</label>
+                <label class="radio-opt"><input type="radio" name="gender" value="female" /> 女</label>
+                <label class="radio-opt"><input type="radio" name="gender" value="other" /> 其他</label>
+              </div>
+            </div>
+
+            <label>咨询问题<textarea name="question" rows="3" placeholder="我近三年事业走势如何？"></textarea></label>
+            <button type="submit" id="submitBtn">开始测算</button>
+          </form>
+        </article>
+
+        <article class="panel result-panel">
+          <div class="result-head">
+            <h2>占卜结果</h2>
+            <button id="clearResult" class="ghost">清空</button>
+          </div>
+          <div id="resultCards" class="cards-wrap">
+            <article class="result-card muted"><h3>等待占卜</h3><p>提交后这里会显示最终结果。</p></article>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="/static/result-ui.js"></script>
+    <script src="/static/bazi.js"></script>
+    <canvas id="bgCanvas"></canvas>
+    <script src="/static/bg-anim.js"></script>
+  </body>
+</html>

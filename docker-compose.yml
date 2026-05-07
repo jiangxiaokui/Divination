@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  divination:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: divination_app
+    restart: unless-stopped
+    ports:
+      - "8086:8000"
+    env_file:
+      - backend/.env
+    # 如果 MySQL 在本机（同一台服务器），让容器能通过宿主机 IP 访问
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # 可选：挂载 .env 为只读，避免容器内误写
+    volumes:
+      - ./backend/.env:/app/.env:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

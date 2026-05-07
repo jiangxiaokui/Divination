@@ -1,0 +1,713 @@
+/* ================================================================
+   Root tokens
+   ================================================================ */
+:root {
+  --bg:        #07091a;
+  --bg2:       #0d1028;
+  --surface:   rgba(255, 255, 255, 0.04);
+  --surface2:  rgba(255, 255, 255, 0.07);
+  --border:    rgba(212, 168, 67, 0.22);
+  --border2:   rgba(255, 255, 255, 0.08);
+  --gold:      #d4a843;
+  --gold2:     #f0c95a;
+  --jade:      #1fa990;
+  --text:      #e8e0d0;
+  --text2:     rgba(232, 224, 208, 0.62);
+  --red:       #e05555;
+  --blue:      #5b9ddb;
+  --ok:        #4caf7d;
+  --warn:      #d4a843;
+  --bad:       #e05555;
+  --radius:    16px;
+  --radius-sm: 10px;
+}
+
+/* ================================================================
+   Reset + Base
+   ================================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+  background-color: var(--bg);
+  min-height: 100vh;
+}
+
+/* ================================================================
+   Background Canvas Animation
+   ================================================================ */
+#bgCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--gold2);
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+  line-height: 1.25;
+}
+
+p {
+  margin: 0;
+}
+
+/* ================================================================
+   Noise overlay (subtle texture)
+   ================================================================ */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* ================================================================
+   Top Navigation
+   ================================================================ */
+.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  height: 56px;
+  background: rgba(7, 9, 26, 0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  font-family: "KaiTi", "STKaiti", "Noto Serif CJK SC", serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gold) !important;
+  letter-spacing: 4px;
+  text-decoration: none;
+  text-shadow: 0 0 18px rgba(212, 168, 67, 0.5);
+}
+
+.nav-links {
+  display: flex;
+  gap: 2px;
+}
+
+.nav-links a {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text2) !important;
+  text-decoration: none;
+  transition: background 0.18s, color 0.18s;
+}
+
+.nav-links a:hover {
+  background: var(--surface2);
+  color: var(--text) !important;
+}
+
+.nav-links a.active {
+  background: rgba(212, 168, 67, 0.15);
+  color: var(--gold) !important;
+  border: 1px solid rgba(212, 168, 67, 0.3);
+}
+
+/* ================================================================
+   Layout Container
+   ================================================================ */
+.container {
+  position: relative;
+  z-index: 1;
+  width: min(1140px, 92vw);
+  margin: 28px auto 48px;
+  display: grid;
+  gap: 20px;
+}
+
+/* ================================================================
+   Panel / Card base
+   ================================================================ */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 24px;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.2s;
+}
+
+.panel:hover {
+  border-color: rgba(212, 168, 67, 0.3);
+}
+
+/* ================================================================
+   Hero Section
+   ================================================================ */
+.hero {
+  text-align: left;
+  padding: 28px 32px;
+  background: linear-gradient(135deg, rgba(31, 169, 144, 0.08), rgba(212, 168, 67, 0.06));
+  border-color: var(--border);
+}
+
+.eyebrow {
+  display: block;
+  margin: 0 0 10px;
+  font-family: "Times New Roman", "Noto Serif", serif;
+  letter-spacing: 3px;
+  color: var(--gold);
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.hero h1 {
+  font-family: "KaiTi", "STKaiti", "Noto Serif CJK SC", serif;
+  font-size: clamp(32px, 5vw, 52px);
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 0 0 40px rgba(212, 168, 67, 0.25);
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.7;
+}
+
+/* ================================================================
+   Status Badge
+   ================================================================ */
+.status {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  background: var(--surface2);
+}
+
+.status.ok   { color: var(--ok);   border-color: rgba(76, 175, 125, 0.4); }
+.status.warn { color: var(--warn); border-color: rgba(212, 168, 67, 0.4); }
+.status.bad  { color: var(--bad);  border-color: rgba(224, 85, 85, 0.4); }
+
+/* ================================================================
+   Index Grid
+   ================================================================ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.portal-link {
+  display: block;
+  text-decoration: none !important;
+  color: var(--text) !important;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 24px;
+  backdrop-filter: blur(10px);
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  cursor: pointer;
+}
+
+.portal-link:hover {
+  transform: translateY(-3px);
+  border-color: var(--border);
+  box-shadow: 0 12px 36px rgba(212, 168, 67, 0.12);
+}
+
+.module-icon {
+  font-size: 26px;
+  line-height: 1;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.portal-link h2 {
+  font-size: 17px;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.portal-link p {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ================================================================
+   Module Layout (form + result)
+   ================================================================ */
+.module-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 400px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.form-panel {
+  position: sticky;
+  top: 72px;
+}
+
+.result-panel {
+  min-height: 400px;
+}
+
+/* ================================================================
+   Form Elements
+   ================================================================ */
+h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 18px;
+  letter-spacing: 0.5px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.form-label,
+label:not(.radio-opt) {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--text2);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+input:not([type="radio"]),
+select,
+textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: auto;
+}
+
+input:not([type="radio"])::placeholder,
+textarea::placeholder {
+  color: rgba(232, 224, 208, 0.3);
+}
+
+input:not([type="radio"]):focus,
+select:focus,
+textarea:focus {
+  border-color: rgba(212, 168, 67, 0.55);
+  box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.12);
+}
+
+select option {
+  background: #1a1e35;
+  color: var(--text);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Submit Button */
+button[type="submit"], button#submitBtn {
+  width: 100%;
+  border: none;
+  background: linear-gradient(120deg, #b8892a, #d4a843 50%, #c9983c);
+  color: #07091a;
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 1px;
+  transition: filter 0.2s, transform 0.1s;
+  box-shadow: 0 4px 18px rgba(212, 168, 67, 0.3);
+}
+
+button[type="submit"]:hover, button#submitBtn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+button[type="submit"]:active, button#submitBtn:active {
+  transform: translateY(0);
+}
+
+button.ghost {
+  background: transparent;
+  border: 1px solid rgba(212, 168, 67, 0.3);
+  color: var(--gold);
+  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.18s;
+}
+
+button.ghost:hover {
+  background: rgba(212, 168, 67, 0.1);
+}
+
+/* ================================================================
+   Mode Toggle
+   ================================================================ */
+.mode-toggle {
+  display: flex;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.mode-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text2);
+  padding: 9px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  border-radius: 0;
+  letter-spacing: 0.3px;
+}
+
+.mode-btn + .mode-btn {
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mode-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  filter: none;
+}
+
+.mode-btn.active {
+  background: rgba(212, 168, 67, 0.2);
+  color: var(--gold2);
+  font-weight: 600;
+}
+
+/* ================================================================
+   Date Row
+   ================================================================ */
+.date-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 2fr;
+  gap: 6px;
+}
+
+.date-part {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  padding: 9px 8px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  appearance: auto;
+}
+
+.date-part:focus {
+  border-color: rgba(212, 168, 67, 0.55);
+  box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.12);
+}
+
+.date-part option {
+  background: #1a1e35;
+  color: var(--text);
+}
+
+/* ================================================================
+   Radio Row  (use span wrapper, NOT label)
+   ================================================================ */
+.radio-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.radio-opt {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+}
+
+.radio-opt input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--gold);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ================================================================
+   Loading State
+   ================================================================ */
+button.loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+button.loading::after {
+  content: "";
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(7, 9, 26, 0.35);
+  border-top-color: #07091a;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  margin-left: 8px;
+  vertical-align: -2px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ================================================================
+   Result Cards
+   ================================================================ */
+.result-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.cards-wrap {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.result-card {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  padding: 16px;
+  border-left: 3px solid rgba(212, 168, 67, 0.3);
+  transition: border-color 0.2s;
+}
+
+.result-card h3 {
+  margin: 0 0 9px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.3px;
+}
+
+.result-card p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--text2);
+}
+
+.result-card.headline {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, rgba(31, 169, 144, 0.06), rgba(212, 168, 67, 0.08));
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+}
+
+.result-card.headline h3 {
+  font-size: 16px;
+  color: #fff;
+}
+
+.result-card.headline p {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.result-card.muted {
+  opacity: 0.5;
+  border-left-color: transparent;
+}
+
+.result-card.tone-info {
+  border-left-color: var(--blue);
+  background: rgba(91, 157, 219, 0.04);
+}
+
+.result-card.tone-neutral {
+  border-left-color: var(--jade);
+}
+
+.result-card.tone-advice {
+  border-left-color: var(--gold);
+  background: rgba(212, 168, 67, 0.04);
+}
+
+.result-card.tone-danger {
+  border-left-color: var(--red);
+  background: rgba(224, 85, 85, 0.05);
+}
+
+.badge {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text2);
+  letter-spacing: 0.5px;
+}
+
+.lot-card {
+  grid-column: span 2;
+}
+
+/* ================================================================
+   Scroll / pre
+   ================================================================ */
+pre {
+  margin: 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border2);
+  background: rgba(0, 0, 0, 0.25);
+  padding: 12px;
+  overflow: auto;
+  max-height: 360px;
+  line-height: 1.5;
+  color: var(--text);
+  font-size: 13px;
+}
+
+/* ================================================================
+   Animations
+   ================================================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.delay-1 { animation-delay: 0.06s; }
+.delay-2 { animation-delay: 0.12s; }
+.delay-3 { animation-delay: 0.18s; }
+.delay-4 { animation-delay: 0.24s; }
+.delay-5 { animation-delay: 0.30s; }
+.delay-6 { animation-delay: 0.36s; }
+
+@keyframes rise {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================================================================
+   Responsive
+   ================================================================ */
+@media (max-width: 960px) {
+  .module-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .form-panel {
+    position: static;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .container {
+    width: min(660px, 94vw);
+    margin-top: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .top-nav {
+    padding: 0 16px;
+  }
+
+  .nav-links a {
+    padding: 5px 10px;
+    font-size: 13px;
+  }
+
+  .date-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .date-row .date-part:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .lot-card {
+    grid-column: span 1;
+  }
+}

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>灵签抽取 · 玄镜</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <nav class="top-nav">
+      <a class="nav-logo" href="/">玄 镜</a>
+      <div class="nav-links">
+        <a href="/bazi">八字</a>
+        <a href="/liuyao">六爻</a>
+        <a href="/name-wuge">姓名</a>
+        <a href="/tarot">塔罗</a>
+        <a href="/lots" class="active">灵签</a>
+      </div>
+    </nav>
+    <main class="container">
+      <section class="hero panel reveal">
+        <p class="eyebrow">Module · LingQian</p>
+        <h1>灵签抽取</h1>
+        <p class="subtitle">观音灵签 / 月老灵签 / 通用签，抽签后直接展示签诗与解签。</p>
+      </section>
+
+      <section class="module-layout reveal delay-1">
+        <article class="panel form-panel">
+          <h2>抽签表单</h2>
+          <form id="lotForm" class="form">
+            <label>
+              签种
+              <select name="lotType">
+                <option value="guanyin">观音灵签</option>
+                <option value="yuelao">月老灵签</option>
+                <option value="generic">通用签</option>
+              </select>
+            </label>
+            <div class="form-group">
+              <span class="form-label">解读模式</span>
+              <div class="mode-toggle">
+                <button type="button" class="mode-btn active" data-mode="fast">⚡ 极速</button>
+                <button type="button" class="mode-btn" data-mode="deep">🔮 深度</button>
+              </div>
+              <input type="hidden" name="readingMode" value="fast" />
+            </div>
+            <label>问题描述<textarea name="question" rows="3" placeholder="这段关系还值得继续吗？"></textarea></label>
+            <button type="submit" id="submitBtn">开始抽签</button>
+          </form>
+        </article>
+
+        <article class="panel result-panel">
+          <div class="result-head">
+            <h2>签文结果</h2>
+            <button id="clearResult" class="ghost">清空</button>
+          </div>
+          <div id="resultCards" class="cards-wrap">
+            <article class="result-card muted"><h3>等待抽签</h3><p>提交后这里会显示签号、签诗和解签。</p></article>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="/static/result-ui.js"></script>
+    <script src="/static/lots.js"></script>
+    <canvas id="bgCanvas"></canvas>
+    <script src="/static/bg-anim.js"></script>
+  </body>
+</html>
