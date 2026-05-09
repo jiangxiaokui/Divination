@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>姻缘合盘 · 玄镜</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <nav class="top-nav">
+      <a class="nav-logo" href="/">玄 镜</a>
+      <div class="nav-links">
+        <a href="/bazi">八字</a>
+        <a href="/liuyao">六爻</a>
+        <a href="/dream">解梦</a>
+        <a href="/compatibility" class="active">姻缘</a>
+        <a href="/name-wuge">姓名</a>
+        <a href="/tarot">塔罗</a>
+        <a href="/lots">灵签</a>
+      </div>
+    </nav>
+    <main class="container">
+      <section class="hero panel reveal">
+        <p class="eyebrow">Module · Compatibility</p>
+        <h1>姻缘合盘</h1>
+        <p class="subtitle">输入双方称呼、关系阶段和当前问题，系统会分步给出连接强弱、推进节奏与相处建议。</p>
+      </section>
+
+      <section class="module-layout reveal delay-1">
+        <article class="panel form-panel">
+          <h2>合盘表单</h2>
+          <form id="compatibilityForm" class="form">
+            <div class="form-group">
+              <span class="form-label">解读模式</span>
+              <div class="mode-toggle">
+                <button type="button" class="mode-btn active" data-mode="fast">⚡ 极速</button>
+                <button type="button" class="mode-btn" data-mode="deep">🔮 深度</button>
+              </div>
+              <input type="hidden" name="readingMode" value="fast" />
+            </div>
+
+            <label>对象 A<input name="personA" required placeholder="我" /></label>
+            <label>对象 B<input name="personB" required placeholder="对方称呼" /></label>
+            <label>
+              关系主题
+              <select name="focus">
+                <option value="relationship">恋爱推进</option>
+                <option value="marriage">婚姻稳定</option>
+                <option value="reunion">复合可能</option>
+                <option value="family">家庭协调</option>
+              </select>
+            </label>
+            <label>
+              当前阶段
+              <select name="relationStage">
+                <option value="暧昧观察">暧昧观察</option>
+                <option value="稳定交往">稳定交往</option>
+                <option value="异地拉扯">异地拉扯</option>
+                <option value="冷淡僵持">冷淡僵持</option>
+                <option value="考虑复合">考虑复合</option>
+              </select>
+            </label>
+            <label>咨询问题<textarea name="question" rows="3" placeholder="我们接下来还有机会走向稳定吗？"></textarea></label>
+            <button type="submit" id="submitBtn">开始合盘</button>
+          </form>
+        </article>
+
+        <article class="panel result-panel">
+          <div class="result-head">
+            <h2>合盘结果</h2>
+            <button id="clearResult" class="ghost">清空</button>
+          </div>
+          <div id="resultCards" class="cards-wrap">
+            <article class="result-card muted"><h3>等待合盘</h3><p>提交关系信息后，这里会逐步显示缘分走势与建议。</p></article>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="/static/result-ui.js"></script>
+    <script src="/static/compatibility.js"></script>
+    <canvas id="bgCanvas"></canvas>
+    <script src="/static/bg-anim.js"></script>
+  </body>
+</html>

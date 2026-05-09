@@ -96,8 +96,9 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   padding: 0 28px;
-  height: 56px;
+  min-height: 56px;
   background: rgba(7, 9, 26, 0.85);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
@@ -116,6 +117,9 @@ body::before {
 .nav-links {
   display: flex;
   gap: 2px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  padding: 8px 0;
 }
 
 .nav-links a {
@@ -560,6 +564,13 @@ button.loading::after {
   transition: border-color 0.2s;
 }
 
+.result-card-headline-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .result-card h3 {
   margin: 0 0 9px;
   font-size: 14px;
@@ -573,6 +584,23 @@ button.loading::after {
   font-size: 13px;
   line-height: 1.75;
   color: var(--text2);
+}
+
+.card-action {
+  flex-shrink: 0;
+  min-width: 72px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 168, 67, 0.24);
+  background: rgba(212, 168, 67, 0.08);
+  color: var(--gold);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.card-action:hover {
+  background: rgba(212, 168, 67, 0.14);
 }
 
 .result-card.headline {
@@ -629,6 +657,154 @@ button.loading::after {
 
 .lot-card {
   grid-column: span 2;
+}
+
+/* ================================================================
+   Result Drawer
+   ================================================================ */
+.result-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 7, 18, 0.52);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+  z-index: 320;
+}
+
+.result-drawer-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.result-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(460px, 92vw);
+  height: 100vh;
+  padding: 18px;
+  background: linear-gradient(180deg, rgba(10, 13, 34, 0.98), rgba(7, 9, 26, 0.98));
+  border-left: 1px solid var(--border);
+  box-shadow: -16px 0 40px rgba(0, 0, 0, 0.3);
+  transform: translateX(104%);
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 330;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.result-drawer.open {
+  transform: translateX(0);
+}
+
+body.drawer-open {
+  overflow: hidden;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.drawer-eyebrow {
+  margin-bottom: 6px;
+  color: var(--gold);
+  opacity: 0.75;
+  letter-spacing: 2px;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.drawer-header h3,
+.drawer-section h4,
+.drawer-summary-card h5,
+.drawer-detail-card h5,
+.timeline-item h5 {
+  margin: 0;
+}
+
+.drawer-content {
+  display: grid;
+  gap: 14px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.drawer-section {
+  display: grid;
+  gap: 10px;
+}
+
+.drawer-section h4 {
+  font-size: 13px;
+  color: var(--text2);
+  letter-spacing: 0.4px;
+}
+
+.drawer-summary-card,
+.drawer-detail-card,
+.timeline-item {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border2);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 14px;
+}
+
+.drawer-summary-card p,
+.drawer-detail-card p,
+.timeline-item p,
+.drawer-empty {
+  color: var(--text2);
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.drawer-empty {
+  margin: 0;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.drawer-timeline {
+  display: grid;
+  gap: 10px;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.timeline-index {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(212, 168, 67, 0.12);
+  color: var(--gold);
+  font-size: 12px;
+  border: 1px solid rgba(212, 168, 67, 0.2);
+}
+
+.timeline-success {
+  border-left: 3px solid var(--ok);
+}
+
+.timeline-progress {
+  border-left: 3px solid var(--blue);
+}
+
+.timeline-danger {
+  border-left: 3px solid var(--red);
 }
 
 /* ================================================================
@@ -692,6 +868,7 @@ pre {
 @media (max-width: 640px) {
   .top-nav {
     padding: 0 16px;
+    gap: 8px;
   }
 
   .nav-links a {
@@ -709,5 +886,13 @@ pre {
 
   .lot-card {
     grid-column: span 1;
+  }
+
+  .result-card-headline-row {
+    flex-direction: column;
+  }
+
+  .card-action {
+    width: fit-content;
   }
 }

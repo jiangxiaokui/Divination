@@ -21,40 +21,60 @@ app = FastAPI(title=settings.app_name, debug=settings.app_debug)
 app.include_router(api_router)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
+HTML_HEADERS = {
+    "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+    "Pragma": "no-cache",
+    "Expires": "0",
+}
+
+
+def html_page(filename: str) -> FileResponse:
+    return FileResponse(WEB_DIR / filename, headers=HTML_HEADERS)
+
 
 @app.get("/")
 def root() -> FileResponse:
-    return FileResponse(WEB_DIR / "index.html")
+    return html_page("index.html")
 
 
 @app.get("/admin")
 def admin_page() -> FileResponse:
-    return FileResponse(WEB_DIR / "admin.html")
+    return html_page("admin.html")
 
 
 @app.get("/bazi")
 def bazi_page() -> FileResponse:
-    return FileResponse(WEB_DIR / "bazi.html")
+    return html_page("bazi.html")
 
 
 @app.get("/liuyao")
 def liuyao_page() -> FileResponse:
-    return FileResponse(WEB_DIR / "liuyao.html")
+    return html_page("liuyao.html")
+
+
+@app.get("/dream")
+def dream_page() -> FileResponse:
+    return html_page("dream.html")
+
+
+@app.get("/compatibility")
+def compatibility_page() -> FileResponse:
+    return html_page("compatibility.html")
 
 
 @app.get("/name-wuge")
 def name_wuge_page() -> FileResponse:
-    return FileResponse(WEB_DIR / "name-wuge.html")
+    return html_page("name-wuge.html")
 
 
 @app.get("/tarot")
 def tarot_page() -> FileResponse:
-    return FileResponse(WEB_DIR / "tarot.html")
+    return html_page("tarot.html")
 
 
 @app.get("/lots")
 def lots_page() -> FileResponse:
-    return FileResponse(WEB_DIR / "lots.html")
+    return html_page("lots.html")
 
 
 @app.get("/favicon.ico", include_in_schema=False)

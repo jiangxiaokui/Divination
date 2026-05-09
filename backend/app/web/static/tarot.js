@@ -23,7 +23,7 @@ document.getElementById("tarotForm").addEventListener("submit", async (e) => {
   setSubmitting(submitBtn, true, "占卜中…");
 
   try {
-    const data = await postJson("/api/v1/readings/tarot", {
+    await streamReading("/api/v1/readings/tarot/stream", {
       user_id: null,
       question: form.question.value.trim() || null,
       client_meta: { from: "web-ui", page: "tarot" },
@@ -34,7 +34,6 @@ document.getElementById("tarotForm").addEventListener("submit", async (e) => {
         allow_reversed: form.allowReversed.value === "true",
       },
     });
-    renderCards(resultCards, data);
   } catch (err) {
     renderError(resultCards, "塔罗占卜失败", err);
   } finally {

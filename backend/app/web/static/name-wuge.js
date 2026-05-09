@@ -23,7 +23,7 @@ document.getElementById("nameForm").addEventListener("submit", async (e) => {
   setSubmitting(submitBtn, true, "分析中…");
 
   try {
-    const data = await postJson("/api/v1/readings/name_wuge", {
+    await streamReading("/api/v1/readings/name_wuge/stream", {
       user_id: null,
       question: form.question.value.trim() || null,
       client_meta: { from: "web-ui", page: "name_wuge" },
@@ -34,7 +34,6 @@ document.getElementById("nameForm").addEventListener("submit", async (e) => {
         gender: form.gender.value,
       },
     });
-    renderCards(resultCards, data);
   } catch (err) {
     renderError(resultCards, "姓名学分析失败", err);
   } finally {

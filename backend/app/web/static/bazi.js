@@ -75,7 +75,7 @@ document.getElementById("baziForm").addEventListener("submit", async (e) => {
   setSubmitting(submitBtn, true, "测算中…");
 
   try {
-    const data = await postJson("/api/v1/readings/bazi", {
+    await streamReading("/api/v1/readings/bazi/stream", {
       user_id: null,
       question: form.question.value.trim() || null,
       client_meta: { from: "web-ui", page: "bazi" },
@@ -86,7 +86,6 @@ document.getElementById("baziForm").addEventListener("submit", async (e) => {
         gender: form.gender.value,
       },
     });
-    renderCards(resultCards, data);
   } catch (err) {
     renderError(resultCards, "八字测算失败", err);
   } finally {

@@ -28,7 +28,7 @@ document.getElementById("liuyaoForm").addEventListener("submit", async (e) => {
   setSubmitting(submitBtn, true, "占卜中…");
 
   try {
-    const data = await postJson("/api/v1/readings/liuyao", {
+    await streamReading("/api/v1/readings/liuyao/stream", {
       user_id: null,
       question: form.question.value.trim() || null,
       client_meta: { from: "web-ui", page: "liuyao" },
@@ -39,7 +39,6 @@ document.getElementById("liuyaoForm").addEventListener("submit", async (e) => {
         line_values: lineValues,
       },
     });
-    renderCards(resultCards, data);
   } catch (err) {
     renderError(resultCards, "六爻占卜失败", err);
   } finally {

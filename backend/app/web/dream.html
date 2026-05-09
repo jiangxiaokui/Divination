@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>解梦 · 玄镜</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <nav class="top-nav">
+      <a class="nav-logo" href="/">玄 镜</a>
+      <div class="nav-links">
+        <a href="/bazi">八字</a>
+        <a href="/liuyao">六爻</a>
+        <a href="/dream" class="active">解梦</a>
+        <a href="/compatibility">姻缘</a>
+        <a href="/name-wuge">姓名</a>
+        <a href="/tarot">塔罗</a>
+        <a href="/lots">灵签</a>
+      </div>
+    </nav>
+    <main class="container">
+      <section class="hero panel reveal">
+        <p class="eyebrow">Module · Dream Reading</p>
+        <h1>解梦</h1>
+        <p class="subtitle">描述梦境内容、当时情绪与重复意象，系统会逐步拆解潜意识正在提醒你的重点。</p>
+      </section>
+
+      <section class="module-layout reveal delay-1">
+        <article class="panel form-panel">
+          <h2>梦境表单</h2>
+          <form id="dreamForm" class="form">
+            <div class="form-group">
+              <span class="form-label">解读模式</span>
+              <div class="mode-toggle">
+                <button type="button" class="mode-btn active" data-mode="fast">⚡ 极速</button>
+                <button type="button" class="mode-btn" data-mode="deep">🔮 深度</button>
+              </div>
+              <input type="hidden" name="readingMode" value="fast" />
+            </div>
+
+            <label>
+              梦境内容
+              <textarea name="dreamText" rows="5" required placeholder="例如：我一直在找回家的路，路上反复看到水和旧学校。"></textarea>
+            </label>
+            <label>
+              醒来后的情绪
+              <select name="emotion">
+                <option value="calm">平静</option>
+                <option value="anxious">焦虑</option>
+                <option value="sad">低落</option>
+                <option value="excited">兴奋</option>
+                <option value="mixed">复杂</option>
+              </select>
+            </label>
+            <label>
+              最近关注主题
+              <select name="recentFocus">
+                <option value="感情">感情</option>
+                <option value="事业">事业</option>
+                <option value="家庭">家庭</option>
+                <option value="学业">学业</option>
+                <option value="自我状态">自我状态</option>
+              </select>
+            </label>
+            <label>重复出现的意象（逗号或顿号分隔）<input name="symbols" placeholder="水、楼梯、旧同学" /></label>
+            <label>你最想知道什么<textarea name="question" rows="3" placeholder="这个梦是在提醒我什么？"></textarea></label>
+            <button type="submit" id="submitBtn">开始解梦</button>
+          </form>
+        </article>
+
+        <article class="panel result-panel">
+          <div class="result-head">
+            <h2>梦境结果</h2>
+            <button id="clearResult" class="ghost">清空</button>
+          </div>
+          <div id="resultCards" class="cards-wrap">
+            <article class="result-card muted"><h3>等待解析</h3><p>提交梦境后，这里会逐步显示推演结果。</p></article>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="/static/result-ui.js"></script>
+    <script src="/static/dream.js"></script>
+    <canvas id="bgCanvas"></canvas>
+    <script src="/static/bg-anim.js"></script>
+  </body>
+</html>

@@ -1,5 +1,7 @@
+import json
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -17,6 +19,8 @@ settings = get_settings()
 
 ALLOWED_MODULES = {
     "bazi",
+    "dream",
+    "compatibility",
     "liuyao",
     "name_wuge",
     "tarot",
@@ -103,8 +107,91 @@ def _kb_judgment(db: Session | None, module: str, label: str, fallback: str) -> 
     return text or fallback
 
 
+def _sse_pack(event: str, payload: dict) -> str:
+    return f"event: {event}\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n"
+
+
 def _build_module_cards(module: str, payload: ReadingCreate, db: Session | None = None) -> tuple[str, str, list[ResultCard]]:
     data = payload.input_payload
+
+    if module == "dream":
+        dream_text = (data.get("dream_text") or payload.question or "").strip()
+        emotion = data.get("emotion", "mixed")
+        recent_focus = data.get("recent_focus", "综合")
+        symbols = [token.strip() for token in str(data.get("symbols", "")).split("，") if token.strip()]
+        if not dream_text:
+            dream_text = "梦境内容未填写，系统将按近期状态做象征性解读。"
+
+        seed = _sum_text(dream_text + emotion + recent_focus + "".join(symbols))
+        score = 42 + (seed % 49)
+        final_label, final_tone = _tone_from_score(score)
+
+        symbol_keywords = symbols[:3] or [dream_text[:6] or "梦境"]
+        symbol_desc = []
+        if db:
+            for keyword in symbol_keywords:
+                hit = kb_service.search_content(db, module="dream", keyword=keyword)
+                if hit:
+                    symbol_desc.append(f"【{keyword}】{hit}")
+
+        cards = [
+            ResultCard(
+                title="梦境速描",
+                content=f"情绪底色: {emotion}\n近期关注: {recent_focus}\n象征关键词: {', '.join(symbols) if symbols else '待系统提取'}",
+                tone="info",
+            ),
+            ResultCard(
+                title="潜意识映射",
+                content="\n\n".join(symbol_desc)
+                or f"这段梦更像是在放大你对“{recent_focus}”的悬念与期待。若梦里反复出现追逐、坠落、错过，通常对应现实中的节奏失控感。",
+                tone="neutral",
+            ),
+            ResultCard(
+                title="当下提示",
+                content=f"结论: {final_label}。先记录最近 3 天触发你情绪波动的人和事，再对照梦中重复出现的场景，你会更快找到真正的焦点。",
+                tone=final_tone,
+            ),
+        ]
+        return "梦境解析", f"梦境解析完成，当前信号为: {final_label}。", cards
+
+    if module == "compatibility":
+        focus = data.get("focus", "relationship")
+        person_a = (data.get("person_a") or "甲方").strip()
+        person_b = (data.get("person_b") or "乙方").strip()
+        relation_stage = data.get("relation_stage", "暧昧观察")
+        concern = (payload.question or data.get("concern") or "").strip()
+        seed = _sum_text(person_a + person_b + relation_stage + concern + focus)
+        score = 38 + (seed % 57)
+        final_label, final_tone = _tone_from_score(score)
+
+        dynamic_text = "你们之间的连接感存在，但推进方式比结果更关键。"
+        if score >= 75:
+            dynamic_text = "双方节奏相对同频，适合把关系从试探推进到明确表达。"
+        elif score < 55:
+            dynamic_text = "当前更像是一方偏热、一方偏慢，过度追问容易透支关系弹性。"
+
+        kb_text = ""
+        if db:
+            kb_text = kb_service.search_content(db, module="compatibility", keyword=relation_stage)
+
+        cards = [
+            ResultCard(
+                title="关系盘面",
+                content=f"对象 A: {person_a}\n对象 B: {person_b}\n阶段: {relation_stage}\n主题: {focus}",
+                tone="info",
+            ),
+            ResultCard(
+                title="缘分走势",
+                content=kb_text or dynamic_text,
+                tone="neutral",
+            ),
+            ResultCard(
+                title="相处建议",
+                content=f"结论: {final_label}。建议先统一期待，再决定是否升级承诺；最忌在信息不足时要求对方立刻给答案。",
+                tone=final_tone,
+            ),
+        ]
+        return "姻缘合盘", f"姻缘合盘完成，当前关系判断为: {final_label}。", cards
 
     if module == "bazi":
         birth_raw = data.get("birth_datetime", "")
@@ -319,12 +406,12 @@ def _build_module_cards(module: str, payload: ReadingCreate, db: Session | None 
     return "占卜请求", "请求已受理。", cards
 
 
-@router.post("/{module}", response_model=ReadingOut)
-def create_reading(module: str, payload: ReadingCreate, db: Session | None = Depends(get_db)) -> ReadingOut:
-    if module not in ALLOWED_MODULES:
-        raise HTTPException(status_code=400, detail=f"unsupported module: {module}")
-
-    headline, summary, cards = _build_module_cards(module, payload, db)
+def _apply_deep_reading(
+    module: str,
+    payload: ReadingCreate,
+    summary: str,
+    cards: list[ResultCard],
+) -> tuple[str, list[ResultCard], object | None]:
     llm_result = None
 
     if payload.reading_mode == "deep":
@@ -341,6 +428,18 @@ def create_reading(module: str, payload: ReadingCreate, db: Session | None = Dep
         except Exception:
             cards.append(ResultCard(title="深度解读", content="当前无法生成深度解读，已返回极速结果。", tone="info"))
 
+    return summary, cards, llm_result
+
+
+def _persist_reading(
+    module: str,
+    payload: ReadingCreate,
+    headline: str,
+    summary: str,
+    cards: list[ResultCard],
+    llm_result: object | None,
+    db: Session | None,
+) -> ReadingOut:
     if not settings.db_persistence_enabled:
         return ReadingOut(
             session_id=0,
@@ -366,7 +465,6 @@ def create_reading(module: str, payload: ReadingCreate, db: Session | None = Dep
     db.add(session)
     db.flush()
 
-    # Persist all user-filled fields for full traceability.
     record = DivinationRecord(
         session_id=session.id,
         module=module,
@@ -403,3 +501,66 @@ def create_reading(module: str, payload: ReadingCreate, db: Session | None = Dep
         summary=summary,
         cards=cards,
     )
+
+
+def _execute_reading(module: str, payload: ReadingCreate, db: Session | None) -> ReadingOut:
+    if module not in ALLOWED_MODULES:
+        raise HTTPException(status_code=400, detail=f"unsupported module: {module}")
+
+    headline, summary, cards = _build_module_cards(module, payload, db)
+    summary, cards, llm_result = _apply_deep_reading(module, payload, summary, cards)
+    return _persist_reading(module, payload, headline, summary, cards, llm_result, db)
+
+
+@router.post("/{module}", response_model=ReadingOut)
+def create_reading(module: str, payload: ReadingCreate, db: Session | None = Depends(get_db)) -> ReadingOut:
+    return _execute_reading(module, payload, db)
+
+
+@router.post("/{module}/stream")
+async def stream_reading(module: str, payload: ReadingCreate, db: Session | None = Depends(get_db)) -> StreamingResponse:
+    if module not in ALLOWED_MODULES:
+        raise HTTPException(status_code=400, detail=f"unsupported module: {module}")
+
+    async def event_generator():
+        try:
+            yield _sse_pack("stage", {"message": "请求已接收，正在构建基础盘面…", "module": module})
+            headline, summary, cards = _build_module_cards(module, payload, db)
+
+            partial_cards: list[ResultCard] = []
+            for index, card in enumerate(cards, start=1):
+                partial_cards.append(card)
+                yield _sse_pack(
+                    "card",
+                    {
+                        "step": index,
+                        "headline": headline,
+                        "summary": summary,
+                        "module": module,
+                        "cards": [item.model_dump() for item in partial_cards],
+                    },
+                )
+
+            llm_result = None
+            if payload.reading_mode == "deep":
+                yield _sse_pack("stage", {"message": "正在生成深度解读…", "module": module})
+                summary, cards, llm_result = _apply_deep_reading(module, payload, summary, cards)
+                if cards:
+                    yield _sse_pack(
+                        "card",
+                        {
+                            "step": len(cards),
+                            "headline": headline,
+                            "summary": summary,
+                            "module": module,
+                            "cards": [item.model_dump() for item in cards],
+                        },
+                    )
+
+            result = _persist_reading(module, payload, headline, summary, cards, llm_result, db)
+            yield _sse_pack("result", result.model_dump(mode="json"))
+            yield _sse_pack("done", {"ok": True})
+        except Exception as exc:
+            yield _sse_pack("error", {"message": str(exc)})
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
