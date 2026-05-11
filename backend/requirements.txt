@@ -6,3 +6,4 @@ alembic==1.13.2
 pydantic-settings==2.5.2
 python-multipart==0.0.9
 openai==1.52.2
+cryptography==46.0.6
