@@ -246,7 +246,10 @@ function renderError(container, title, err) {
 async function postJson(url, payload) {
   const response = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(window.userAuth?.getAuthHeaders?.() || {}),
+    },
     body: JSON.stringify(payload),
   });
 
@@ -262,7 +265,10 @@ async function postJson(url, payload) {
 async function streamReading(url, payload, container) {
   const response = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(window.userAuth?.getAuthHeaders?.() || {}),
+    },
     body: JSON.stringify(payload),
   });
 

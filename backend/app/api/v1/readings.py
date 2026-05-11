@@ -1,10 +1,13 @@
 import json
+import random
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
+from app.core.user_auth import UserSession, get_optional_user
 from app.db.session import get_db
 from app.models.divination_record import DivinationRecord
 from app.models.divination_session import DivinationSession
@@ -107,8 +110,74 @@ def _kb_judgment(db: Session | None, module: str, label: str, fallback: str) -> 
     return text or fallback
 
 
+def _short_question(question: str | None, limit: int = 32) -> str | None:
+    if not question:
+        return None
+    compact = " ".join(question.strip().split())
+    if not compact:
+        return None
+    if len(compact) <= limit:
+        return compact
+    return f"{compact[: limit - 1]}…"
+
+
+def _build_question_focus_card(question: str | None) -> ResultCard | None:
+    short_question = _short_question(question, limit=120)
+    if not short_question:
+        return None
+    return ResultCard(
+        title="本次问题聚焦",
+        content=f"你这次最想解决的是: {short_question}",
+        tone="info",
+    )
+
+
 def _sse_pack(event: str, payload: dict) -> str:
     return f"event: {event}\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n"
+
+
+def _build_user_context(user: User | None, db: Session | None) -> dict | None:
+    if user is None or db is None:
+        return None
+
+    recent_sessions = db.scalars(
+        select(DivinationSession)
+        .where(DivinationSession.user_id == user.id)
+        .order_by(DivinationSession.created_at.desc(), DivinationSession.id.desc())
+        .limit(3)
+    ).all()
+
+    return {
+        "nickname": user.nickname,
+        "profile": user.profile_payload or {},
+        "recent_questions": [session.question for session in recent_sessions if session.question],
+        "recent_categories": [session.category for session in recent_sessions],
+    }
+
+
+def _append_user_context_card(cards: list[ResultCard], user_context: dict | None) -> list[ResultCard]:
+    if not user_context:
+        return cards
+
+    profile = user_context.get("profile") or {}
+    hints: list[str] = []
+    if user_context.get("nickname"):
+        hints.append(f"当前用户: {user_context['nickname']}")
+    if profile.get("city"):
+        hints.append(f"所在城市: {profile['city']}")
+    if profile.get("relationship_status"):
+        hints.append(f"情感状态: {profile['relationship_status']}")
+    tags = profile.get("tags")
+    if isinstance(tags, list) and tags:
+        hints.append(f"关注标签: {'、'.join(str(tag) for tag in tags[:4])}")
+    recent_questions = user_context.get("recent_questions") or []
+    if recent_questions:
+        hints.append(f"最近提问: {' / '.join(str(item) for item in recent_questions[:2])}")
+
+    if not hints:
+        return cards
+
+    return cards + [ResultCard(title="个人上下文参考", content="\n".join(hints), tone="info")]
 
 
 def _build_module_cards(module: str, payload: ReadingCreate, db: Session | None = None) -> tuple[str, str, list[ResultCard]]:
@@ -118,6 +187,7 @@ def _build_module_cards(module: str, payload: ReadingCreate, db: Session | None 
         dream_text = (data.get("dream_text") or payload.question or "").strip()
         emotion = data.get("emotion", "mixed")
         recent_focus = data.get("recent_focus", "综合")
+        question_hint = _short_question(payload.question, limit=42)
         symbols = [token.strip() for token in str(data.get("symbols", "")).split("，") if token.strip()]
         if not dream_text:
             dream_text = "梦境内容未填写，系统将按近期状态做象征性解读。"
@@ -148,7 +218,11 @@ def _build_module_cards(module: str, payload: ReadingCreate, db: Session | None 
             ),
             ResultCard(
                 title="当下提示",
-                content=f"结论: {final_label}。先记录最近 3 天触发你情绪波动的人和事，再对照梦中重复出现的场景，你会更快找到真正的焦点。",
+                content=(
+                    f"结论: {final_label}。"
+                    f"{f' 围绕“{question_hint}”，' if question_hint else ' '}"
+                    "先记录最近 3 天触发你情绪波动的人和事，再对照梦中重复出现的场景，你会更快找到真正的焦点。"
+                ),
                 tone=final_tone,
             ),
         ]
@@ -347,6 +421,7 @@ def _build_module_cards(module: str, payload: ReadingCreate, db: Session | None 
         spread = data.get("spread", "three_card")
         orientation = bool(data.get("allow_reversed", True))
         theme = data.get("question_type", "综合")
+        question_hint = _short_question(payload.question, limit=42)
 
         tarot_pool = [
             ("太阳", "积极成长，信心增强"),
@@ -364,40 +439,82 @@ def _build_module_cards(module: str, payload: ReadingCreate, db: Session | None 
             ("死神", "结束转化，旧阶段终结"),
             ("审判", "觉醒召唤，重要决定"),
             ("世界", "完成整合，新循环开始"),
+            ("恋人", "关系选择，价值对齐"),
+            ("隐士", "向内回看，寻找真正答案"),
+            ("倒吊人", "暂停换角度，别急着下判断"),
+            ("恶魔", "执念束缚，先看清依赖点"),
+            ("高塔", "旧结构震动，倒逼重新调整"),
+            ("月亮", "情绪起伏，信息尚未完全明朗"),
+            ("教皇", "回到原则，重视长期秩序"),
         ]
         draw_count = 1 if spread == "single_card" else (10 if spread == "celtic_cross" else 3)
         seed = _sum_text((payload.question or "") + spread + theme)
 
+        rng = random.Random(seed)
+        shuffled_pool = tarot_pool[:]
+        rng.shuffle(shuffled_pool)
         drawn = []
-        for i in range(draw_count):
-            idx = (seed + i * 7) % len(tarot_pool)
-            card_name, card_meaning = tarot_pool[idx]
-            reversed_flag = orientation and ((seed + i) % 2 == 1)
+        for i, (card_name, card_meaning) in enumerate(shuffled_pool[:draw_count]):
+            reversed_flag = orientation and (rng.random() >= 0.5)
             drawn.append((card_name, card_meaning, reversed_flag))
+
+        position_labels_map = {
+            "single_card": ["核心指引"],
+            "three_card": ["过去", "现在", "未来"],
+            "celtic_cross": [
+                "现状",
+                "阻力",
+                "显性目标",
+                "潜在基础",
+                "近期过去",
+                "近期发展",
+                "你的位置",
+                "外部环境",
+                "希望与担忧",
+                "最终走向",
+            ],
+        }
+        position_labels = position_labels_map.get(spread, [f"第{i + 1}张" for i in range(draw_count)])
 
         positive = sum(1 for _, _, rev in drawn if not rev)
         score = 45 + int((positive / max(draw_count, 1)) * 45)
         final_label, final_tone = _tone_from_score(score)
-        # 从知识库取牌义详解
-        drawn_lines = []
+
+        cards = [
+            ResultCard(
+                title="牌阵参数",
+                content=(
+                    f"牌阵: {spread}\n允许逆位: {orientation}\n主题: {theme}"
+                    + (f"\n咨询重点: {question_hint}" if question_hint else "")
+                ),
+                tone="info",
+            )
+        ]
         for i, (name, meaning, rev) in enumerate(drawn):
             kb_desc = kb_service.get_content(db, module="tarot", category="大阿卡纳", keyword=name) if db else ""
             pos_label = "逆位" if rev else "正位"
-            if kb_desc:
-                drawn_lines.append(f"第{i+1}张【{name}·{pos_label}】\n{kb_desc}")
-            else:
-                drawn_lines.append(f"第{i+1}张【{name}·{pos_label}】{meaning}")
-        drawn_text = "\n\n".join(drawn_lines)
+            position_label = position_labels[i] if i < len(position_labels) else f"第{i + 1}张"
+            detail_text = kb_desc or meaning
+            direction_hint = "逆位提示: 当前能量受阻，建议先处理卡点。" if rev else "正位提示: 这张牌的能量可以顺势放大。"
+            cards.append(
+                ResultCard(
+                    title=f"{position_label} · {name} {pos_label}",
+                    content=f"{detail_text}\n{direction_hint}",
+                    tone="neutral",
+                )
+            )
 
-        cards = [
-            ResultCard(title="牌阵参数", content=f"牌阵: {spread}\n允许逆位: {orientation}\n主题: {theme}", tone="info"),
-            ResultCard(title="抽牌结果", content=drawn_text, tone="neutral"),
+        cards.append(
             ResultCard(
                 title="最终结果",
-                content=f"结论: {final_label}。建议将重心放在你最可控的下一步行动上。",
+                content=(
+                    f"结论: {final_label}。"
+                    f"{f' 围绕“{question_hint}”，' if question_hint else ' ' }"
+                    "建议将重心放在你最可控的下一步行动上，先确认当前最该推进的是判断、沟通还是行动。"
+                ),
                 tone=final_tone,
             ),
-        ]
+        )
         return "塔罗占卜", f"塔罗解读完成，结论为: {final_label}。", cards
 
     cards = [
@@ -411,6 +528,7 @@ def _apply_deep_reading(
     payload: ReadingCreate,
     summary: str,
     cards: list[ResultCard],
+    user_context: dict | None = None,
 ) -> tuple[str, list[ResultCard], object | None]:
     llm_result = None
 
@@ -421,6 +539,7 @@ def _apply_deep_reading(
                 question=payload.question,
                 summary=summary,
                 cards=[c.model_dump() for c in cards],
+                user_context=user_context,
             )
             if llm_result and llm_result.content:
                 cards.append(ResultCard(title="深度解读", content=llm_result.content, tone="advice"))
@@ -507,25 +626,54 @@ def _execute_reading(module: str, payload: ReadingCreate, db: Session | None) ->
     if module not in ALLOWED_MODULES:
         raise HTTPException(status_code=400, detail=f"unsupported module: {module}")
 
+    user = db.get(User, payload.user_id) if (db is not None and payload.user_id is not None) else None
+    user_context = _build_user_context(user, db)
     headline, summary, cards = _build_module_cards(module, payload, db)
-    summary, cards, llm_result = _apply_deep_reading(module, payload, summary, cards)
+    question_card = _build_question_focus_card(payload.question)
+    if question_card is not None:
+        cards = [question_card, *cards]
+        summary = f"{summary} 当前聚焦问题: {_short_question(payload.question, limit=28)}。"
+    cards = _append_user_context_card(cards, user_context)
+    if user_context:
+        summary = f"{summary} 已参考你的个人档案与最近记录。"
+    summary, cards, llm_result = _apply_deep_reading(module, payload, summary, cards, user_context=user_context)
     return _persist_reading(module, payload, headline, summary, cards, llm_result, db)
 
 
 @router.post("/{module}", response_model=ReadingOut)
-def create_reading(module: str, payload: ReadingCreate, db: Session | None = Depends(get_db)) -> ReadingOut:
+def create_reading(
+    module: str,
+    payload: ReadingCreate,
+    current_user: UserSession | None = Depends(get_optional_user),
+    db: Session | None = Depends(get_db),
+) -> ReadingOut:
+    if current_user is not None:
+        payload.user_id = current_user.user_id
     return _execute_reading(module, payload, db)
 
 
 @router.post("/{module}/stream")
-async def stream_reading(module: str, payload: ReadingCreate, db: Session | None = Depends(get_db)) -> StreamingResponse:
+async def stream_reading(
+    module: str,
+    payload: ReadingCreate,
+    current_user: UserSession | None = Depends(get_optional_user),
+    db: Session | None = Depends(get_db),
+) -> StreamingResponse:
     if module not in ALLOWED_MODULES:
         raise HTTPException(status_code=400, detail=f"unsupported module: {module}")
+
+    if current_user is not None:
+        payload.user_id = current_user.user_id
 
     async def event_generator():
         try:
             yield _sse_pack("stage", {"message": "请求已接收，正在构建基础盘面…", "module": module})
+            user = db.get(User, payload.user_id) if (db is not None and payload.user_id is not None) else None
+            user_context = _build_user_context(user, db)
             headline, summary, cards = _build_module_cards(module, payload, db)
+            cards = _append_user_context_card(cards, user_context)
+            if user_context:
+                summary = f"{summary} 已参考你的个人档案与最近记录。"
 
             partial_cards: list[ResultCard] = []
             for index, card in enumerate(cards, start=1):
@@ -544,7 +692,7 @@ async def stream_reading(module: str, payload: ReadingCreate, db: Session | None
             llm_result = None
             if payload.reading_mode == "deep":
                 yield _sse_pack("stage", {"message": "正在生成深度解读…", "module": module})
-                summary, cards, llm_result = _apply_deep_reading(module, payload, summary, cards)
+                summary, cards, llm_result = _apply_deep_reading(module, payload, summary, cards, user_context=user_context)
                 if cards:
                     yield _sse_pack(
                         "card",

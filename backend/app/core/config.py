@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     admin_username: str = "admin"
     admin_password: str = "change_me"
     admin_session_ttl_minutes: int = 720
+    user_token_secret: str = "change_me_user_token"
+    user_password_aes_secret: str = "change_me_user_password_aes_secret"
 
     # Option 1: full SQLAlchemy URL (requires manual URL encoding for special chars in password).
     database_url: str | None = None

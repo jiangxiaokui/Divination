@@ -39,7 +39,10 @@
           <form id="runtimeForm" class="form inline">
             <button type="submit">刷新状态</button>
           </form>
-          <pre id="runtimeBox">请先登录后查看...</pre>
+          <div id="runtimeSummary" class="admin-runtime-grid">
+            <div class="admin-empty">请先登录后查看...</div>
+          </div>
+          <div id="runtimeMeta" class="admin-inline-list"></div>
         </article>
       </section>
 
@@ -47,11 +50,46 @@
         <div class="result-head">
           <h2>最近占卜记录</h2>
           <form id="recordsForm" class="form inline">
+            <select name="queryMode">
+              <option value="all">默认查询: 最近全部</option>
+              <option value="has_name">非默认: 已填写姓名/对象</option>
+              <option value="has_question">非默认: 已填写问题</option>
+              <option value="has_name_and_question">非默认: 姓名和问题都已填</option>
+              <option value="has_name_or_question">非默认: 姓名或问题任一已填</option>
+            </select>
             <input name="limit" type="number" min="1" max="200" value="50" />
             <button type="submit">加载记录</button>
           </form>
         </div>
-        <pre id="recordsBox">请先登录后加载记录...</pre>
+        <div id="recordsSummary" class="admin-metric-grid">
+          <div class="admin-empty">请先登录后加载记录...</div>
+        </div>
+        <div id="moduleSummary" class="admin-chip-row"></div>
+        <div class="admin-records-layout">
+          <div class="admin-table-shell">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>记录</th>
+                  <th>模块</th>
+                  <th>姓名/对象</th>
+                  <th>问题</th>
+                  <th>用户</th>
+                  <th>置信度</th>
+                  <th>LLM</th>
+                  <th>时间</th>
+                  <th>详情</th>
+                </tr>
+              </thead>
+              <tbody id="recordsTableBody"></tbody>
+            </table>
+            <p id="recordsEmpty" class="admin-empty">请先登录后加载记录...</p>
+          </div>
+
+          <aside id="recordDetail" class="admin-detail-panel">
+            <p class="admin-detail-placeholder">选择一条记录后，可查看入库详情、输入参数和原始结果。</p>
+          </aside>
+        </div>
       </section>
     </main>
 

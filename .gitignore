@@ -43,3 +43,4 @@ backend/alembic/versions/*.pyc
 backend/patch_*.py
 backend/inject_*.py
 backend/_patch_*.py
+backend/app/scripts/decrypt.py

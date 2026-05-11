@@ -58,3 +58,8 @@ class SessionHistoryOut(BaseModel):
     question: str | None
     created_at: datetime
     records: list[HistoryRecordOut]
+
+
+class UserHistoryOut(BaseModel):
+    user_id: int
+    sessions: list[SessionHistoryOut]

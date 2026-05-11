@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>我的 · 玄镜</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <nav class="top-nav">
+      <a class="nav-logo" href="/">玄 镜</a>
+      <div class="nav-links">
+        <a href="/my" class="active">我的</a>
+        <a href="/bazi">八字</a>
+        <a href="/liuyao">六爻</a>
+        <a href="/dream">解梦</a>
+        <a href="/compatibility">姻缘</a>
+        <a href="/name-wuge">姓名</a>
+        <a href="/tarot">塔罗</a>
+        <a href="/lots">灵签</a>
+      </div>
+    </nav>
+    <main class="container">
+      <section class="hero panel reveal">
+        <p class="eyebrow">Account Center</p>
+        <h1>我的</h1>
+        <p class="subtitle">不登录也可以直接使用占卜功能。登录后会保存个人历史记录、上下文与档案信息。</p>
+        <div class="status" id="userCenterStatus">正在检查登录状态…</div>
+      </section>
+
+      <section class="module-layout reveal delay-1">
+        <article class="panel form-panel">
+          <div id="authGuestView">
+            <h2>登录 / 注册</h2>
+            <div class="mode-toggle auth-toggle">
+              <button type="button" class="mode-btn active" data-auth-mode="login">登录</button>
+              <button type="button" class="mode-btn" data-auth-mode="register">注册</button>
+            </div>
+
+            <form id="authForm" class="form">
+              <label>用户名<input name="username" required minlength="3" placeholder="3-64 位用户名" /></label>
+              <label data-register-only hidden>昵称<input name="nickname" placeholder="展示昵称" /></label>
+              <label>密码<input name="password" type="password" required minlength="6" placeholder="至少 6 位密码" /></label>
+              <label data-register-only hidden>所在城市<input name="registerCity" placeholder="例如：杭州" /></label>
+              <label data-register-only hidden>
+                性别
+                <select name="registerGender">
+                  <option value="">未填写</option>
+                  <option value="male">男</option>
+                  <option value="female">女</option>
+                  <option value="other">其他</option>
+                </select>
+              </label>
+              <label data-register-only hidden>情感状态<input name="registerRelationshipStatus" placeholder="例如：单身 / 恋爱中" /></label>
+              <label data-register-only hidden>兴趣标签（逗号分隔）<input name="registerTags" placeholder="例如：事业, 感情, 学业" /></label>
+              <label data-register-only hidden>个人简介<textarea name="registerBio" rows="4" placeholder="可以简单写下你当前最关心的方向。"></textarea></label>
+              <button type="submit" id="authSubmitBtn">登录</button>
+            </form>
+          </div>
+
+          <div id="authSignedView" hidden>
+            <h2>当前账号</h2>
+            <div id="authSignedSummary" class="cards-wrap">
+              <article class="result-card tone-info"><h3>已登录</h3><p>当前账号信息已同步。</p></article>
+            </div>
+            <button id="logoutUserBtn" class="ghost" style="margin-top: 10px">退出登录</button>
+          </div>
+        </article>
+
+        <article class="panel result-panel">
+          <div class="result-head">
+            <h2>个人档案</h2>
+            <button id="refreshProfileBtn" class="ghost">刷新</button>
+          </div>
+          <div id="profileCards" class="cards-wrap">
+            <article class="result-card muted"><h3>未登录</h3><p>登录后可查看并维护个人档案信息。</p></article>
+          </div>
+
+          <div class="result-head" style="margin-top: 18px">
+            <h2>档案编辑</h2>
+            <button id="saveProfileBtn" class="ghost">保存档案</button>
+          </div>
+          <form id="profileForm" class="form profile-form">
+            <label>昵称<input name="nickname" placeholder="展示昵称" /></label>
+            <label>所在城市<input name="city" placeholder="例如：杭州" /></label>
+            <label>
+              性别
+              <select name="gender">
+                <option value="">未填写</option>
+                <option value="male">男</option>
+                <option value="female">女</option>
+                <option value="other">其他</option>
+              </select>
+            </label>
+            <label>出生年份<input name="birthYear" type="number" min="1900" max="2100" placeholder="例如：1998" /></label>
+            <label>情感状态<input name="relationshipStatus" placeholder="例如：单身 / 恋爱中" /></label>
+            <label>兴趣标签（逗号分隔）<input name="tags" placeholder="例如：事业, 感情, 学业" /></label>
+            <label class="profile-form-span-2">个人简介<textarea name="bio" rows="4" placeholder="写一点你希望系统长期记住的背景信息。"></textarea></label>
+            <label class="profile-form-span-2">补充备注<textarea name="notes" rows="4" placeholder="可记录长期目标、最近困扰、偏好方向等。"></textarea></label>
+          </form>
+        </article>
+      </section>
+
+      <section class="panel reveal delay-2">
+        <div class="result-head">
+          <h2>历史记录</h2>
+          <button id="refreshHistoryBtn" class="ghost">刷新历史</button>
+        </div>
+        <div id="historyCards" class="cards-wrap">
+          <article class="result-card muted"><h3>暂无历史</h3><p>登录后你的个人占卜记录会显示在这里。</p></article>
+        </div>
+      </section>
+    </main>
+
+    <script src="/static/auth.js"></script>
+    <script src="/static/my.js"></script>
+    <canvas id="bgCanvas"></canvas>
+    <script src="/static/bg-anim.js"></script>
+  </body>
+  </html>

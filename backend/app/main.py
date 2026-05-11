@@ -42,6 +42,11 @@ def admin_page() -> FileResponse:
     return html_page("admin.html")
 
 
+@app.get("/my")
+def my_page() -> FileResponse:
+    return html_page("my.html")
+
+
 @app.get("/bazi")
 def bazi_page() -> FileResponse:
     return html_page("bazi.html")
