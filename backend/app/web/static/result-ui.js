@@ -16,6 +16,165 @@ let drawerRoot = null;
 let drawerBackdrop = null;
 let activeDrawerContainer = null;
 let activeDrawerIndex = null;
+const pageStatePrefix = "xj_page_state_v1:";
+
+function getPageStateKey(pageKey) {
+  return `${pageStatePrefix}${pageKey}`;
+}
+
+function syncModeButtons(form) {
+  const readingMode = form?.elements?.readingMode?.value;
+  if (!readingMode) {
+    return;
+  }
+
+  document.querySelectorAll(".mode-btn").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.mode === readingMode);
+  });
+}
+
+function serializeFormState(form) {
+  const data = {};
+  if (!form?.elements) {
+    return data;
+  }
+
+  for (const field of form.elements) {
+    if (!field.name || field.disabled) {
+      continue;
+    }
+
+    if (field.type === "radio") {
+      if (field.checked) {
+        data[field.name] = field.value;
+      }
+      continue;
+    }
+
+    if (field.type === "checkbox") {
+      data[field.name] = Boolean(field.checked);
+      continue;
+    }
+
+    if (field.tagName === "SELECT" && field.multiple) {
+      data[field.name] = Array.from(field.selectedOptions).map((opt) => opt.value);
+      continue;
+    }
+
+    data[field.name] = field.value;
+  }
+
+  return data;
+}
+
+function applyFormState(form, data) {
+  if (!form?.elements || !data || typeof data !== "object") {
+    return;
+  }
+
+  for (const [name, value] of Object.entries(data)) {
+    const fields = form.querySelectorAll(`[name="${CSS.escape(name)}"]`);
+    if (!fields.length) {
+      continue;
+    }
+
+    fields.forEach((field) => {
+      if (field.type === "radio") {
+        field.checked = field.value === value;
+        return;
+      }
+
+      if (field.type === "checkbox") {
+        field.checked = Boolean(value);
+        return;
+      }
+
+      if (field.tagName === "SELECT" && field.multiple && Array.isArray(value)) {
+        Array.from(field.options).forEach((opt) => {
+          opt.selected = value.includes(opt.value);
+        });
+        return;
+      }
+
+      field.value = value ?? "";
+    });
+  }
+}
+
+function initPageState(options) {
+  const pageKey = options?.pageKey;
+  const form = options?.form;
+  const resultContainer = options?.resultContainer;
+
+  if (!pageKey || !form || !resultContainer || typeof sessionStorage === "undefined") {
+    return {
+      saveNow() {},
+      clear() {},
+    };
+  }
+
+  const storageKey = getPageStateKey(pageKey);
+  const readStored = () => {
+    const raw = sessionStorage.getItem(storageKey);
+    if (!raw) {
+      return null;
+    }
+    try {
+      return JSON.parse(raw);
+    } catch {
+      sessionStorage.removeItem(storageKey);
+      return null;
+    }
+  };
+
+  const saveNow = () => {
+    const payload = {
+      form: serializeFormState(form),
+      resultHtml: resultContainer.innerHTML,
+      savedAt: Date.now(),
+    };
+    sessionStorage.setItem(storageKey, JSON.stringify(payload));
+  };
+
+  const clear = () => {
+    sessionStorage.removeItem(storageKey);
+  };
+
+  const stored = readStored();
+  if (stored?.form) {
+    applyFormState(form, stored.form);
+  }
+  syncModeButtons(form);
+  if (stored?.resultHtml) {
+    resultContainer.innerHTML = stored.resultHtml;
+  }
+
+  const onFieldChange = () => {
+    syncModeButtons(form);
+    saveNow();
+  };
+
+  form.addEventListener("input", onFieldChange);
+  form.addEventListener("change", onFieldChange);
+
+  const observer = new MutationObserver(() => {
+    saveNow();
+  });
+  observer.observe(resultContainer, {
+    childList: true,
+    subtree: true,
+    characterData: true,
+  });
+
+  window.addEventListener("beforeunload", saveNow);
+
+  return {
+    saveNow,
+    clear,
+  };
+}
+
+window.initPageState = initPageState;
 
 function getResultState(container) {
   if (!resultStateStore.has(container)) {

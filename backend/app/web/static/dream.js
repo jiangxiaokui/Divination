@@ -8,13 +8,20 @@ document.querySelectorAll(".mode-btn").forEach((btn) => {
 
 const resultCards = document.getElementById("resultCards");
 const submitBtn = document.getElementById("submitBtn");
+const dreamForm = document.getElementById("dreamForm");
+
+initPageState({
+  pageKey: "dream",
+  form: dreamForm,
+  resultContainer: resultCards,
+});
 
 function resetResult() {
   resultCards.innerHTML =
     '<article class="result-card muted"><h3>等待解析</h3><p>提交梦境后，这里会逐步显示推演结果。</p></article>';
 }
 
-document.getElementById("dreamForm").addEventListener("submit", async (event) => {
+dreamForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const form = event.currentTarget;
 

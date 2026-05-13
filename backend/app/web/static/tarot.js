@@ -9,13 +9,20 @@ document.querySelectorAll(".mode-btn").forEach((btn) => {
 
 const resultCards = document.getElementById("resultCards");
 const submitBtn   = document.getElementById("submitBtn");
+const tarotForm = document.getElementById("tarotForm");
+
+initPageState({
+  pageKey: "tarot",
+  form: tarotForm,
+  resultContainer: resultCards,
+});
 
 function resetResult() {
   resultCards.innerHTML =
     '<article class="result-card muted"><h3>等待占卜</h3><p>提交后这里会显示最终结果。</p></article>';
 }
 
-document.getElementById("tarotForm").addEventListener("submit", async (e) => {
+tarotForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const form = e.currentTarget;
 
@@ -33,7 +40,7 @@ document.getElementById("tarotForm").addEventListener("submit", async (e) => {
         spread: form.spread.value,
         allow_reversed: form.allowReversed.value === "true",
       },
-    });
+    }, resultCards);
   } catch (err) {
     renderError(resultCards, "塔罗占卜失败", err);
   } finally {

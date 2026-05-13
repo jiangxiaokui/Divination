@@ -55,13 +55,20 @@ document.querySelectorAll(".mode-btn").forEach((btn) => {
 // ── 表单提交 ──
 const resultCards = document.getElementById("resultCards");
 const submitBtn   = document.getElementById("submitBtn");
+const baziForm = document.getElementById("baziForm");
+
+initPageState({
+  pageKey: "bazi",
+  form: baziForm,
+  resultContainer: resultCards,
+});
 
 function resetResult() {
   resultCards.innerHTML =
     '<article class="result-card muted"><h3>等待占卜</h3><p>提交后这里会显示最终结果。</p></article>';
 }
 
-document.getElementById("baziForm").addEventListener("submit", async (e) => {
+baziForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const form = e.currentTarget;
 
@@ -85,7 +92,7 @@ document.getElementById("baziForm").addEventListener("submit", async (e) => {
         birth_place: form.birthPlace.value.trim() || null,
         gender: form.gender.value,
       },
-    });
+    }, resultCards);
   } catch (err) {
     renderError(resultCards, "八字测算失败", err);
   } finally {

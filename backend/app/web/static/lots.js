@@ -9,13 +9,20 @@ document.querySelectorAll(".mode-btn").forEach((btn) => {
 
 const resultCards = document.getElementById("resultCards");
 const submitBtn   = document.getElementById("submitBtn");
+const lotForm = document.getElementById("lotForm");
+
+initPageState({
+  pageKey: "lots",
+  form: lotForm,
+  resultContainer: resultCards,
+});
 
 function resetResult() {
   resultCards.innerHTML =
     '<article class="result-card muted"><h3>等待抽签</h3><p>提交后这里会显示最终结果。</p></article>';
 }
 
-document.getElementById("lotForm").addEventListener("submit", async (e) => {
+lotForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const form = e.currentTarget;
 

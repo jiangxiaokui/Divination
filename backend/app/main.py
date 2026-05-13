@@ -16,10 +16,13 @@ settings = get_settings()
 BASE_DIR = Path(__file__).resolve().parent
 WEB_DIR = BASE_DIR / "web"
 STATIC_DIR = WEB_DIR / "static"
+ASSET_DIR = BASE_DIR.parent / "static"
 
 app = FastAPI(title=settings.app_name, debug=settings.app_debug)
 app.include_router(api_router)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+if ASSET_DIR.exists():
+    app.mount("/assets", StaticFiles(directory=ASSET_DIR), name="assets")
 
 HTML_HEADERS = {
     "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",

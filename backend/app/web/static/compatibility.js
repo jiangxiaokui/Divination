@@ -8,13 +8,20 @@ document.querySelectorAll(".mode-btn").forEach((btn) => {
 
 const resultCards = document.getElementById("resultCards");
 const submitBtn = document.getElementById("submitBtn");
+const compatibilityForm = document.getElementById("compatibilityForm");
+
+initPageState({
+  pageKey: "compatibility",
+  form: compatibilityForm,
+  resultContainer: resultCards,
+});
 
 function resetResult() {
   resultCards.innerHTML =
     '<article class="result-card muted"><h3>等待合盘</h3><p>提交关系信息后，这里会逐步显示缘分走势与建议。</p></article>';
 }
 
-document.getElementById("compatibilityForm").addEventListener("submit", async (event) => {
+compatibilityForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const form = event.currentTarget;
 

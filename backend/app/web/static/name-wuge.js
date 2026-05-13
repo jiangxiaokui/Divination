@@ -9,13 +9,20 @@ document.querySelectorAll(".mode-btn").forEach((btn) => {
 
 const resultCards = document.getElementById("resultCards");
 const submitBtn   = document.getElementById("submitBtn");
+const nameForm = document.getElementById("nameForm");
+
+initPageState({
+  pageKey: "name_wuge",
+  form: nameForm,
+  resultContainer: resultCards,
+});
 
 function resetResult() {
   resultCards.innerHTML =
     '<article class="result-card muted"><h3>等待分析</h3><p>提交后这里会显示最终结果。</p></article>';
 }
 
-document.getElementById("nameForm").addEventListener("submit", async (e) => {
+nameForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const form = e.currentTarget;
 
@@ -33,7 +40,7 @@ document.getElementById("nameForm").addEventListener("submit", async (e) => {
         script_type: form.scriptType.value,
         gender: form.gender.value,
       },
-    });
+    }, resultCards);
   } catch (err) {
     renderError(resultCards, "姓名学分析失败", err);
   } finally {

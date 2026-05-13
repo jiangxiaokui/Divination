@@ -13,7 +13,29 @@
     <link rel="prefetch" href="/lots" />
     <link rel="stylesheet" href="/static/style.css" />
   </head>
-  <body>
+  <body class="home-portal portal-locked">
+    <div class="book-intro" id="bookIntro" aria-live="polite">
+      <div class="book-intro-bg"></div>
+      <div class="book-intro-stars" aria-hidden="true"></div>
+      <div class="book-shell" id="bookShell" role="button" tabindex="0" aria-label="点击翻开天机书">
+        <div class="book-frame-corner corner-a"></div>
+        <div class="book-frame-corner corner-b"></div>
+        <div class="book-frame-corner corner-c"></div>
+        <div class="book-frame-corner corner-d"></div>
+        <div class="book-cover-front">
+          <p class="book-title">玄镜天机卷</p>
+          <p class="book-sub">轻启此卷，窥见来路与去向</p>
+          <button type="button" class="book-open-btn" id="bookOpenBtn">轻触翻开</button>
+        </div>
+        <div class="book-page-glow">
+          <span class="book-sigil" aria-hidden="true"></span>
+          <span>天机将启</span>
+        </div>
+        <div class="book-cover-back"></div>
+      </div>
+      <p class="book-intro-tip">点击翻开，透露天机</p>
+      <button type="button" class="ghost book-skip" id="bookSkip">略过开场</button>
+    </div>
     <nav class="top-nav">
       <a class="nav-logo" href="/">玄 镜</a>
       <div class="nav-links">
@@ -27,53 +49,125 @@
         <a href="/lots">灵签</a>
       </div>
     </nav>
-    <main class="container">
-      <section class="hero panel reveal">
-        <p class="eyebrow">Divination Workbench</p>
-        <h1>玄镜 · 占卜台</h1>
-        <p class="subtitle">古法推演，洞察命理玄机。选择模块，即刻入局。</p>
-        <div class="status" id="runtimeStatus">正在检测服务状态…</div>
+    <main class="container portal-stage">
+      <section class="hero hero-portal panel">
+        <div class="hero-copy">
+          <p class="eyebrow">Divination Workbench</p>
+          <h1>玄镜 · 占卜台</h1>
+          <p class="subtitle">古法推演，洞察命理玄机。选择模块，即刻入局。</p>
+          <p class="hero-lead">从命盘、六爻、塔罗到灵签，把传统推演方式收拢成一张可直接进入的玄学地图。</p>
+          <div class="status" id="runtimeStatus">正在检测服务状态…</div>
+        </div>
+        <div class="hero-oracle" aria-hidden="true">
+          <div class="oracle-disc"></div>
+          <div class="oracle-rings ring-a"></div>
+          <div class="oracle-rings ring-b"></div>
+          <div class="oracle-column">
+            <p class="oracle-kicker">镜头已就位</p>
+            <h2>翻卷之后，七门尽开</h2>
+            <p>先选术，再起局。命盘看大势，六爻断应期，塔罗照内心，灵签问结果。</p>
+          </div>
+        </div>
       </section>
 
-      <section class="grid">
-        <a class="portal-link reveal delay-1" href="/bazi">
-          <span class="module-icon">☯</span>
-          <h2>八字命理（四柱）</h2>
-          <p>以生辰八字推算五行命盘，解读命势与大运走向。</p>
+      <section class="grid module-gallery">
+        <a class="portal-link featured theme-bazi" href="/bazi">
+          <div class="portal-link-visual">
+            <span class="module-icon">☯</span>
+            <span class="portal-link-mark">命盘</span>
+            <span class="portal-link-orbit orbit-a"></span>
+            <span class="portal-link-orbit orbit-b"></span>
+          </div>
+          <div class="portal-link-body">
+            <p class="portal-link-kicker">Four Pillars</p>
+            <h2>八字命理（四柱）</h2>
+            <p>以生辰八字推算五行命盘，解读命势与大运走向。</p>
+            <span class="portal-link-cta">进入推演</span>
+          </div>
         </a>
-        <a class="portal-link reveal delay-2" href="/liuyao">
-          <span class="module-icon">☵</span>
-          <h2>六爻占卜</h2>
-          <p>摇卦起爻，动静互参，直出吉凶判断与应期。</p>
+        <a class="portal-link featured theme-liuyao" href="/liuyao">
+          <div class="portal-link-visual">
+            <span class="module-icon">☵</span>
+            <span class="portal-link-mark">起卦</span>
+            <span class="portal-link-orbit orbit-a"></span>
+            <span class="portal-link-orbit orbit-b"></span>
+          </div>
+          <div class="portal-link-body">
+            <p class="portal-link-kicker">Hexagram Casting</p>
+            <h2>六爻占卜</h2>
+            <p>摇卦起爻，动静互参，直出吉凶判断与应期。</p>
+            <span class="portal-link-cta">开始摇卦</span>
+          </div>
         </a>
-        <a class="portal-link reveal delay-3" href="/name-wuge">
-          <span class="module-icon">字</span>
-          <h2>姓名学 · 五格剖象</h2>
-          <p>拆解天地人外总五格数理，评判姓名吉凶能量。</p>
+        <a class="portal-link theme-name" href="/name-wuge">
+          <div class="portal-link-visual">
+            <span class="module-icon">字</span>
+            <span class="portal-link-mark">五格</span>
+            <span class="portal-link-orbit orbit-a"></span>
+          </div>
+          <div class="portal-link-body">
+            <p class="portal-link-kicker">Name Reading</p>
+            <h2>姓名学 · 五格剖象</h2>
+            <p>拆解天地人外总五格数理，评判姓名吉凶能量。</p>
+            <span class="portal-link-cta">测算姓名</span>
+          </div>
         </a>
-        <a class="portal-link reveal delay-4" href="/tarot">
-          <span class="module-icon">🃏</span>
-          <h2>塔罗占卜</h2>
-          <p>大阿卡纳牌阵抽牌，结合主题给出深度解读。</p>
+        <a class="portal-link theme-tarot" href="/tarot">
+          <div class="portal-link-visual">
+            <span class="module-icon">🃏</span>
+            <span class="portal-link-mark">牌阵</span>
+            <span class="portal-link-orbit orbit-a"></span>
+          </div>
+          <div class="portal-link-body">
+            <p class="portal-link-kicker">Arcana Spread</p>
+            <h2>塔罗占卜</h2>
+            <p>大阿卡纳牌阵抽牌，结合主题给出深度解读。</p>
+            <span class="portal-link-cta">翻牌入局</span>
+          </div>
         </a>
-        <a class="portal-link reveal delay-5" href="/lots">
-          <span class="module-icon">🎋</span>
-          <h2>灵签（观音 / 月老）</h2>
-          <p>虔诚起意，随机抽签，签诗解签一步到位。</p>
+        <a class="portal-link theme-lots" href="/lots">
+          <div class="portal-link-visual">
+            <span class="module-icon">🎋</span>
+            <span class="portal-link-mark">签诗</span>
+            <span class="portal-link-orbit orbit-a"></span>
+          </div>
+          <div class="portal-link-body">
+            <p class="portal-link-kicker">Sacred Lots</p>
+            <h2>灵签（观音 / 月老）</h2>
+            <p>虔诚起意，随机抽签，签诗解签一步到位。</p>
+            <span class="portal-link-cta">抽取灵签</span>
+          </div>
         </a>
-        <a class="portal-link reveal delay-2" href="/dream">
-          <span class="module-icon">☾</span>
-          <h2>解梦</h2>
-          <p>记录梦境、情绪与意象，逐步拆解潜意识发出的提示。</p>
+        <a class="portal-link theme-dream" href="/dream">
+          <div class="portal-link-visual">
+            <span class="module-icon">☾</span>
+            <span class="portal-link-mark">梦象</span>
+            <span class="portal-link-orbit orbit-a"></span>
+          </div>
+          <div class="portal-link-body">
+            <p class="portal-link-kicker">Dream Signals</p>
+            <h2>解梦</h2>
+            <p>记录梦境、情绪与意象，逐步拆解潜意识发出的提示。</p>
+            <span class="portal-link-cta">进入梦析</span>
+          </div>
         </a>
-        <a class="portal-link reveal delay-6" href="/compatibility">
-          <span class="module-icon">♡</span>
-          <h2>姻缘合盘</h2>
-          <p>查看关系节奏、连接强弱与下一步相处建议。</p>
+        <a class="portal-link theme-love" href="/compatibility">
+          <div class="portal-link-visual">
+            <span class="module-icon">♡</span>
+            <span class="portal-link-mark">合盘</span>
+            <span class="portal-link-orbit orbit-a"></span>
+          </div>
+          <div class="portal-link-body">
+            <p class="portal-link-kicker">Affinity Match</p>
+            <h2>姻缘合盘</h2>
+            <p>查看关系节奏、连接强弱与下一步相处建议。</p>
+            <span class="portal-link-cta">查看缘势</span>
+          </div>
         </a>
       </section>
     </main>
 
+    <script src="/static/immersive.js"></script>
     <script src="/static/portal.js"></script>
     <canvas id="bgCanvas"></canvas>
     <script src="/static/bg-anim.js"></script>
