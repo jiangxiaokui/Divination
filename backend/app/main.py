@@ -1,11 +1,13 @@
 from pathlib import Path
 
-from fastapi import FastAPI
-from fastapi.responses import FileResponse, Response
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.api.v1.router import router as api_router
 from app.core.config import get_settings
+from app.core.site_gate import request_has_site_gate
 from app.db.base import Base
 from app.db.session import engine
 
@@ -30,13 +32,58 @@ HTML_HEADERS = {
     "Expires": "0",
 }
 
+SITE_GATE_PUBLIC_PREFIXES = (
+    "/static/",
+    "/assets/",
+    "/favicon.ico",
+    "/healthz",
+    "/api/v1/site-gate/",
+)
+
+
+def _is_site_gate_public(path: str) -> bool:
+    if path == "/":
+        return True
+    return any(path.startswith(prefix) for prefix in SITE_GATE_PUBLIC_PREFIXES)
+
+
+class SiteGateMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        if not settings.site_gate_enabled:
+            return await call_next(request)
+
+        path = request.url.path
+        if _is_site_gate_public(path):
+            return await call_next(request)
+
+        if request_has_site_gate(request):
+            return await call_next(request)
+
+        if path.startswith("/api/"):
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "site gate required"},
+            )
+
+        return RedirectResponse(url="/", status_code=302)
+
+
+app.add_middleware(SiteGateMiddleware)
+
 
 def html_page(filename: str) -> FileResponse:
     return FileResponse(WEB_DIR / filename, headers=HTML_HEADERS)
 
 
 @app.get("/")
-def root() -> FileResponse:
+def root(request: Request):
+    if settings.site_gate_enabled and request_has_site_gate(request):
+        return RedirectResponse(url="/home", status_code=302)
+    return html_page("gate.html")
+
+
+@app.get("/home")
+def home_page() -> FileResponse:
     return html_page("index.html")
 
 

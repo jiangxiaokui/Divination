@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>入口</title>
+    <link rel="stylesheet" href="/static/gate.css" />
+  </head>
+  <body>
+    <main class="gate-shell">
+      <form class="gate-form" id="gateForm" autocomplete="off">
+        <label class="gate-label" for="gatePassword">口令</label>
+        <input
+          id="gatePassword"
+          class="gate-input"
+          type="password"
+          name="password"
+          placeholder="请输入访问口令"
+          required
+          autofocus
+        />
+        <p class="gate-error" id="gateError" hidden></p>
+        <button class="gate-submit" type="submit" id="gateSubmit">进入</button>
+      </form>
+    </main>
+    <script src="/static/gate.js"></script>
+  </body>
+</html>

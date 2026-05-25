@@ -35,7 +35,6 @@
       const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
       const [r, gr, bl] = b.cr;
       g.addColorStop(0,   `rgba(${r},${gr},${bl},${b.a})`);
-      g.addColorStop(0.5, `rgba(${r},${gr},${bl},${b.a * 0.4})`);
       g.addColorStop(1,   `rgba(${r},${gr},${bl},0)`);
       ctx.fillStyle = g;
       ctx.beginPath();
@@ -45,8 +44,8 @@
   }
 
   /* ── Stars ────────────────────────────────────────── */
-  const STAR_COUNT = 220;
-  const stars = Array.from({ length: STAR_COUNT }, () => ({
+  const STAR_COUNT = 120;
+  const stars = Array.from({ length: STAR_COUNT }, (_, i) => ({
     x:    Math.random(),
     y:    Math.random(),
     size: Math.random() * 1.6 + 0.3,
@@ -58,6 +57,8 @@
     // subtle drift
     vx:   (Math.random() - 0.5) * 0.000012,
     vy:   (Math.random() - 0.5) * 0.000008,
+    // only first 15 stars get the expensive radial glow
+    glow: i < 15,
   }));
 
   function drawStars(t) {
@@ -67,8 +68,8 @@
       const alpha = s.base * (0.55 + 0.45 * Math.sin(s.phase + s.freq * t));
       const px = s.x * W;
       const py = s.y * H;
-      // glow for larger stars
-      if (s.size > 1.2) {
+      // glow for limited stars only
+      if (s.glow) {
         const g = ctx.createRadialGradient(px, py, 0, px, py, s.size * 3);
         g.addColorStop(0,   `rgba(255,245,220,${alpha * 0.6})`);
         g.addColorStop(1,   `rgba(255,245,220,0)`);
@@ -135,8 +136,13 @@
 
   /* ── Main loop ────────────────────────────────────── */
   let last = 0;
+  const FRAME_INTERVAL = 33; // ~30 fps cap
   function frame(ts) {
     const dt = ts - last;
+    if (dt < FRAME_INTERVAL) {
+      requestAnimationFrame(frame);
+      return;
+    }
     last = ts;
 
     ctx.clearRect(0, 0, W, H);

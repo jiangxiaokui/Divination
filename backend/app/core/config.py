@@ -13,6 +13,11 @@ class Settings(BaseSettings):
     admin_username: str = "admin"
     admin_password: str = "change_me"
     admin_session_ttl_minutes: int = 720
+    site_gate_enabled: bool = True
+    site_gate_password: str = ""
+    site_gate_cookie_secret: str = "change_me_site_gate_secret"
+    site_gate_ttl_seconds: int = 604800
+    site_gate_cookie_secure: bool = False
     user_token_secret: str = "change_me_user_token"
     user_password_aes_secret: str = "change_me_user_password_aes_secret"
 
@@ -21,7 +26,7 @@ class Settings(BaseSettings):
 
     # Option 2: split fields, password will be URL encoded automatically.
     db_host: str = "127.0.0.1"
-    db_port: int = 3306
+    db_port: int = 32306
     db_user: str = "root"
     db_password: str = "root"
     db_name: str = "divination"

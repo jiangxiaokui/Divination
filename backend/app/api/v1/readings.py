@@ -1,4 +1,5 @@
 import json
+import logging
 import random
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
@@ -19,6 +20,7 @@ from app.services import kb_service
 
 router = APIRouter(prefix="/readings", tags=["readings"])
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 ALLOWED_MODULES = {
     "bazi",
@@ -544,7 +546,8 @@ def _apply_deep_reading(
             if llm_result and llm_result.content:
                 cards.append(ResultCard(title="深度解读", content=llm_result.content, tone="advice"))
                 summary = f"{summary} 已生成深度解读。"
-        except Exception:
+        except Exception as exc:
+            logger.warning("deep reading LLM call failed: %s: %s", type(exc).__name__, exc)
             cards.append(ResultCard(title="深度解读", content="当前无法生成深度解读，已返回极速结果。", tone="info"))
 
     return summary, cards, llm_result

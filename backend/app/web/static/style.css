@@ -1420,7 +1420,6 @@ pre {
 .home-portal.portal-unsealing .container {
   opacity: 0.34;
   transform: scale(1.08) translateY(30px);
-  filter: blur(16px) saturate(0.72);
 }
 
 .home-portal.portal-revealed .top-nav {
@@ -1528,6 +1527,7 @@ pre {
   text-align: center;
   transform-origin: left center;
   transform: rotateY(0deg);
+  will-change: transform;
   background:
     linear-gradient(180deg, rgba(8, 8, 8, 0.16), rgba(8, 8, 8, 0.54)),
     var(--portal-book-cover) center/cover no-repeat,
@@ -1975,17 +1975,14 @@ body.page-transition-ready.page-transition-entered {
 @keyframes cinema-push {
   0% {
     opacity: 0.2;
-    filter: blur(18px) saturate(0.7);
     transform: scale(1.08) translateY(30px);
   }
   55% {
     opacity: 0.92;
-    filter: blur(4px) saturate(1.06);
     transform: scale(1.02) translateY(0);
   }
   100% {
     opacity: 1;
-    filter: blur(0) saturate(1);
     transform: scale(1) translateY(0);
   }
 }
